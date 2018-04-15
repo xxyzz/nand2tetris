@@ -28,7 +28,14 @@
  /*
   *             15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
   * Instruction  i  x  x  a   c1 c2 c3 c4   c5 c6 d1 d2   d3 j1 j2 j3
-  * 
+  *
+  * Destination
+  * d1 = 1, A register
+  * d2 = 1, D register
+  * d3 = 1, Memory[A]
+  *
+  * ALU: x = D, y = A(a=0) or M(a=1), zx = c1, nx = c2, zy = c3, ny = c4, f = c5, no = c6
+  *
   * Jump consition
   * instruction[15] = 1
   * instruction[0] = 1, zr = 0, ng = 0 (>0)
