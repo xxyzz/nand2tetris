@@ -2,9 +2,13 @@
 *.tst
 *.out
 *.hack
+*.class
 00/
 demo/
-06/
+06/add/
+06/max/
+06/pong/
+06/rect
 07/
 08/
 09/
