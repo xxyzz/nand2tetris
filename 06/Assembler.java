@@ -9,21 +9,26 @@
  *
  ******************************************************************************/
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.Out;
+// import edu.princeton.cs.algs4.StdOut;
 
 public class Assembler {
     public Assembler() { }
 
     public static void main(String[] args) {
         In in = new In(args[0]);
+        Out out = new Out(args[0].substring(args[0].lastIndexOf('/') + 1, args[0].indexOf('.')) + ".hack");
         while (!in.isEmpty()) {
             Parser parser = new Parser(in);
             parser.advance();
-            StdOut.println("comandtype: " + parser.commandType());
-            StdOut.println("symbol: " + parser.symbol());
-            StdOut.println("dest: " + parser.dest());
-            StdOut.println("comp: " + parser.comp());
-            StdOut.println("jump: " + parser.jump());
+            if (parser.commandType() == 0) {
+                out.println(String.format("%16s", Integer.toBinaryString(Integer.parseInt(parser.symbol()))).replace(' ', '0'));
+            }
+            else if (parser.commandType() == 1) {
+                Code code = new Code(parser.dest(), parser.comp(), parser.jump());
+                out.println("111" + code.comp() + code.dest() + code.jump());
+            }
         }
+        out.close();
     }
 }
