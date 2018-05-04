@@ -50,9 +50,9 @@ public class Parser {
     public int commandType() {
         // A_COMMAND
         if (command.charAt(0) == '@') return 0;
-        // C_COMMAND
-        else if (command.charAt(0) == '(') return 2;
         // L_COMMAND
+        else if (command.charAt(0) == '(') return 2;
+        // C_COMMAND
         return 1;
     }
 
