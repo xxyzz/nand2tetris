@@ -8,7 +8,7 @@
  ******************************************************************************/
 
 import edu.princeton.cs.algs4.In;
-// import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.StdOut;
 
 public class Parser {
     // command type constants declaration
@@ -54,7 +54,7 @@ public class Parser {
      * C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL
      */
     public int commandType() {
-        if (command.length() > 4 && command.substring(4).equals("push")) return C_PUSH;
+        if (command.length() > 4 && command.substring(0, 4).equals("push")) return C_PUSH;
         else if (command.length() > 3 && command.substring(0, 3).equals("pop")) return C_POP;
         else if (command.length() > 5 && command.substring(0, 5).equals("label")) return C_LABEL;
         else if (command.length() > 4 && command.substring(0, 4).equals("goto")) return C_GOTO;
@@ -89,5 +89,16 @@ public class Parser {
             return command.split(" ")[2];
         }
         return null;
+    }
+
+    // test
+    public static void main(String[] args) {
+        In in = new In(args[0]);
+        while (!in.isEmpty()) {
+            Parser parser = new Parser(in);
+            parser.advance();
+            StdOut.println("arg1: " + parser.arg1());
+            StdOut.println("arg2: " + parser.arg2());
+        }
     }
 }
