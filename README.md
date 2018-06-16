@@ -13,3 +13,5 @@ Building a Modern Computer From First Principles
 - Project 5: [Computer Architecture](http://nand2tetris.org/05.php)
 
 - Project 6: [The Assembler](http://nand2tetris.org/06.php)
+
+- Project 7: [Virtual Machine I - Stack Arithmetic](http://nand2tetris.org/07.php)

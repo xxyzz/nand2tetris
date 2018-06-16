@@ -26,17 +26,21 @@ public class Parser {
     }
 
     /**
-     * Reads the next command from the input and makes it the current command. 
+     * Reads the next command from the input and makes it the current command.
      * Should be called only if hasMoreCommands() is true.
      * Initially there is no current command.
      */
     public void advance() {
         if (hasMoreCommands()) {
+            // read one line and remove white spaces
             String readCommand = in.readLine().replaceAll("\\s+", "");
+            // skip comments
             if (!readCommand.equals("") && readCommand.charAt(0) != '/') {
+                // remove the comments after commands
                 if (readCommand.contains("/")) readCommand = readCommand.substring(0, readCommand.indexOf('/'));
                 command = readCommand;
             }
+            // try next line
             else advance();
         }
     }
