@@ -83,12 +83,12 @@ public class Parser {
      * Returns the second argument of the current command.
      * Should be called only if the current command is C_PUSH, C_POP, C_FUNCTION, or C_CALL.
      */
-    public String arg2() {
+    public int arg2() {
         int commandType = commandType();
         if (commandType == C_PUSH || commandType == C_POP || commandType == C_FUNCTION || commandType == C_CALL) {
-            return command.split(" ")[2];
+            return Integer.parseInt(command.split(" ")[2]);
         }
-        return null;
+        return 0;
     }
 
     // test

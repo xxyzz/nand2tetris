@@ -19,7 +19,7 @@ public class Assembler {
         In in = new In(args[0]);
         int n = 0;
         int m = 16;
-        Out out = new Out(args[0].substring(args[0].lastIndexOf('/') + 1, args[0].indexOf('.')) + ".hack");
+        Out out = new Out(args[0].substring(0, args[0].lastIndexOf('.')) + ".hack");
         SymbolTable symbolTable = new SymbolTable();
         
         // Handling label symbols
