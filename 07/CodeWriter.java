@@ -12,54 +12,78 @@ import edu.princeton.cs.algs4.Out;
 public class CodeWriter {
     private final Out out;
     private final String fileName;
+    private int lCommands;
 
     // Opens the output file/stream and gets ready to write into it
     public CodeWriter(String inputPath) {
-        fileName = inputPath.substring(0, inputPath.lastIndexOf('.'));
-        out = new Out(fileName + ".asm");
+        fileName = inputPath.substring(inputPath.lastIndexOf('/') + 1, inputPath.lastIndexOf('.'));
+        out = new Out(inputPath.substring(0, inputPath.lastIndexOf('.')) + ".asm");
+        lCommands = 0;
     }
 
     // Writes to the output file the assembly code that implements the given arithmetic command.
+    // true in VM: -1 0xFFFF 1111111111111111
+    // false in VM: 0 0x0000 0000000000000000
     public void writeArithmetic(String command) {
-        printArithmeticCommant(command);
+        printArithmeticComment(command);
+        out.println("@SP\nAM=M-1");
         switch (command) {
             case "add":
-                out.println("@SP\nAM=M-1\nD=M\nA=A-1\nM=M+D\nA=A+1");
+                out.println("D=M\nA=A-1\nM=M+D");
                 break;
             case "sub":
-                out.println("@SP\nAM=M-1\nD=M\nA=A-1\nM=M-D\nA=A+1");
+                out.println("D=M\nA=A-1\nM=M-D");
                 break;
             case "neg":
-                out.println("@SP\nAM=M-1\nM=-M\nA=A+1");
+                out.println("M=-M\n@SP\nAM=M+1");
                 break;
             case "eq":
-                out.println("@SP\n" +
-                            "AM=M-1\n" +
-                            "D=M\n" +
+                out.println("D=M\n" +
                             "A=A-1\n" +
                             "D=M-D\n" +
                             "M=0\n" +
-                            "@END_EQ\n" +
-                            "D;JNE\n" +
+                            "@END_EQ" + lCommands +
+                            "\nD;JNE\n" +
                             "@SP\n" +
                             "A=M-1\n" +
                             "M=-1\n" +
-                            "(END_EQ)\n" +
-                            "@SP\n" +
-                            "A=A+1");
+                            "(END_EQ" + lCommands + ")");
+                lCommands++;
                 break;
             case "gt":
+                out.println("D=M\n" +
+                            "A=A-1\n" +
+                            "D=M-D\n" +
+                            "M=0\n" +
+                            "@END_GT" + lCommands +
+                            "\nD;JLE\n" +
+                            "@SP\n" +
+                            "A=M-1\n" +
+                            "M=-1\n" +
+                            "(END_GT" + lCommands + ")");
+                lCommands++;
                 break;
             case "lt":
+                out.println("D=M\n" +
+                            "A=A-1\n" +
+                            "D=M-D\n" +
+                            "M=0\n" +
+                            "@END_LT" + lCommands +
+                            "\nD;JGE\n" +
+                            "@SP\n" +
+                            "A=M-1\n" +
+                            "M=-1\n" +
+                            "(END_LT" + lCommands + ")");
+                lCommands++;
                 break;
             case "and":
-                out.println("@SP\nA=M\nD=M\nA=A-1\nM=M&D");
+                out.println("D=M\nA=A-1\nM=M&D");
                 break;
             case "or":
-                out.println("@SP\nA=M\nD=M\nA=A-1\nM=M|D");
+                out.println("D=M\nA=A-1\nM=M|D");
                 break;
             case "not":
-                out.println("@SP\nA=M\nM=!M");
+                out.println("M=!M\n@SP\nAM=M+1");
                 break;
             default:
                 break;
@@ -71,7 +95,7 @@ public class CodeWriter {
      *  where command is either C_PUSH or C_POP.
      */
     public void writePushPop(int command, String segment, int index) {
-        printPushPopCommant(command, segment, index);
+        printPushPopComment(command, segment, index);
         // push
         if (command == 1) {
             switch (segment) {
@@ -149,7 +173,7 @@ public class CodeWriter {
                                 "D=A");
                     break;
                 case "constant":
-                    out.println("D=" + index);
+                    out.println("@" + index + "\nD=A");
                     break;
                 case "this":
                     out.println("@THIS\n" +
@@ -164,10 +188,10 @@ public class CodeWriter {
                                 "D=D+A");
                     break;
                 case "pointer":
-                    out.println("D=" + (index + 3));
+                    out.println("@" + (index + 3) + "\nD=A");
                     break;
                 case "temp":
-                    out.println("D=" + (index + 5));
+                    out.println("@" + (index + 5) + "\nD=A");
                     break;
                 default:
                     break;
@@ -188,11 +212,11 @@ public class CodeWriter {
         out.close();
     }
 
-    private void printArithmeticCommant(String command) {
+    private void printArithmeticComment(String command) {
         out.println("// " + command);
     }
 
-    private void printPushPopCommant(int command, String segment, int index) {
+    private void printPushPopComment(int command, String segment, int index) {
         if (command == 1) {
             out.println("// push " + segment + " " + index);
         }
