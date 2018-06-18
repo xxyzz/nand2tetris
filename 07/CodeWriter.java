@@ -97,7 +97,7 @@ public class CodeWriter {
     public void writePushPop(int command, String segment, int index) {
         printPushPopComment(command, segment, index);
         // push
-        if (command == 1) {
+        if (command == Parser.C_PUSH) {
             switch (segment) {
                 case "argument":
                     out.println("@ARG\n" +
@@ -153,7 +153,7 @@ public class CodeWriter {
                         "M=D");
         }
         // pop
-        if (command == 2) {
+        if (command == Parser.C_POP) {
             switch (segment) {
                 case "argument":
                     out.println("@ARG\n" +
@@ -217,7 +217,7 @@ public class CodeWriter {
     }
 
     private void printPushPopComment(int command, String segment, int index) {
-        if (command == 1) {
+        if (command == Parser.C_PUSH) {
             out.println("// push " + segment + " " + index);
         }
         else {

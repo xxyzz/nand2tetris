@@ -20,12 +20,12 @@ public class VMTranslator {
                 int commandType = parser.commandType();
                 switch (commandType) {
                     // C_ARITHMETIC
-                    case 0:
+                    case Parser.C_ARITHMETIC:
                         codeWriter.writeArithmetic(parser.arg1());
                         break;
                     // C_PUSH || C_POP
-                    case 1:
-                    case 2:
+                    case Parser.C_PUSH:
+                    case Parser.C_POP:
                         codeWriter.writePushPop(commandType, parser.arg1(), parser.arg2());
                         break;
                     default:

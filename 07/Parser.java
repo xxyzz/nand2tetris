@@ -12,7 +12,7 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class Parser {
     // command type constants declaration
-    private static final int C_ARITHMETIC = 0, C_PUSH = 1, C_POP = 2, C_LABEL = 3, C_GOTO = 4, 
+    public static final int C_ARITHMETIC = 0, C_PUSH = 1, C_POP = 2, C_LABEL = 3, C_GOTO = 4, 
         C_IF = 5, C_FUNCTION = 6, C_RETURN = 7, C_CALL = 8;
 
     private final In in;
