@@ -4,13 +4,14 @@
 *.hack
 *.class
 *.vm
+*.html
+*.asm
 00/
 demo/
 06/add/
 06/max/
 06/pong/
 06/rect
-08/
 09/
 10/
 11/
