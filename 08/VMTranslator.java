@@ -31,6 +31,9 @@ public class VMTranslator {
                 case Parser.C_IF:
                     codeWriter.writeIf(parser.arg1());
                     break;
+                case Parser.C_GOTO:
+                    codeWriter.writeGoto(parser.arg1());
+                    break;
                 default:
                     break;
             }

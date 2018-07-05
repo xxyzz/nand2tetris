@@ -58,7 +58,7 @@ public class CodeWriter {
 
     // Writes assembly code that effects the goto command
     public void writeGoto(String label) {
-
+        out.println("@" + label + "\n0;JMP");
     }
 
     // Writes assembly code that effects the if-goto command
