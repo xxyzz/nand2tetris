@@ -14,29 +14,21 @@ public class CodeWriter {
     private Out out;
     private String fileName;
     private int lCommands;
+    private int returnNum;
 
     // Opens the output file/stream and gets ready to write into it
     public CodeWriter(String inputPath) {
         lCommands = 0;
+        returnNum = 0;
+        out = new Out(inputPath);
     }
 
     /**
      * Informs the codeWriter that the translation of a new VM file has
      * started(called by the main program of the VM translator)
      */
-    public void setFileName(String inputPath) {
-        // .vm file
-        File folder = new File(inputPath);
-        if (folder.isDirectory()) {
-            if (inputPath.substring(inputPath.length() - 1).equals("/")) out = new Out(inputPath + fileName + ".asm");
-            else out = new Out(inputPath + "/" +fileName +".asm");
-        }
-        else if (folder.isFile()) {
-            fileName = folder.getName();
-            if (fileName.substring(fileName.length() - 3).equals(".vm")) {
-                out = new Out(inputPath.substring(0, inputPath.lastIndexOf('.')) + ".asm");
-            }
-        }
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     /**
@@ -72,7 +64,10 @@ public class CodeWriter {
 
     // Writes assembly code that effects the function command
     public void writeFunction(String functionName, int numVars) {
-
+        out.println("(" + functionName + ")");
+        for (int i = 0; i < numVars; i++) {
+            writePushPop(Parser.C_PUSH, "constant", 0);
+        }
     }
 
     // Writes assembly code that effects the call command
@@ -82,7 +77,68 @@ public class CodeWriter {
 
     // Writes assembly code that effects the return command
     public void writeReturn() {
+        out.println("// write return");
+        // FRAME = LCL
+        // writePushPop() uses R13, so use R14 here
+        out.println("@LCL\n" +
+                    "D=M\n" +
+                    "@R14\n" +
+                    "M=D");
 
+        // RET = *(FRAME - 5)
+        out.println("@5\n" +
+                    "A=D-A\n" +
+                    "D=M\n" +
+                    "@RETURN" + returnNum + "\n" +
+                    "M=D");
+
+        // *ARG = pop()
+        writePushPop(Parser.C_POP, "argument", 0);
+
+        // SP = ARG+1
+        out.println("@ARG\n" +
+                    "D=M\n" +
+                    "@SP\n" +
+                    "M=D+1");
+
+        // THAT = *(FRAME-1)
+        out.println("@R14\n" +
+                    "A=M-1\n" +
+                    "D=M\n" +
+                    "@THAT\n" +
+                    "M=D");
+
+        // THIS = *(FRAME-2)
+        out.println("@R14\n" +
+                    "D=M\n" +
+                    "@2\n" +
+                    "A=D-A\n" +
+                    "D=M\n" +
+                    "@THIS\n" +
+                    "M=D");
+
+        // ARG = *(FRAME-3)
+        out.println("@R14\n" +
+                    "D=M\n" +
+                    "@3\n" +
+                    "A=D-A\n" +
+                    "D=M\n" +
+                    "@ARG\n" +
+                    "M=D");
+
+        // LCL = *(FRAME-4)
+        out.println("@R14\n" +
+                    "D=M\n" +
+                    "@4\n" +
+                    "A=D-A\n" +
+                    "D=M\n" +
+                    "@LCL\n" +
+                    "M=D");
+
+        // goto RET
+        out.println("@ARG\nA=M\nD=M");
+        out.println("@RETURN" + returnNum++);
+        out.println("A=M\nM=D");
     }
 
     /** Writes to the output file the assembly code that implements the given arithmetic command.
@@ -266,7 +322,7 @@ public class CodeWriter {
                         "@SP\n" +
                         "AM=M-1\n" +
                         "D=M\n" +
-                        "@13\n" +
+                        "@R13\n" +
                         "A=M\n" +
                         "M=D");
         }

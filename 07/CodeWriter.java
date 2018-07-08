@@ -201,7 +201,7 @@ public class CodeWriter {
                         "@SP\n" +
                         "AM=M-1\n" +
                         "D=M\n" +
-                        "@13\n" +
+                        "@R13\n" +
                         "A=M\n" +
                         "M=D");
         }
