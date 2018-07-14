@@ -61,7 +61,7 @@ public class Parser {
         else if (command.length() > 2 && command.substring(0, 2).equals("if")) return C_IF;
         else if (command.length() > 8 && command.substring(0, 8).equals("function")) return C_FUNCTION;
         else if (command.equals("return")) return C_RETURN;
-        else if (command.length() > 5 && command.substring(0, 5).equals("call")) return C_CALL;
+        else if (command.length() > 4 && command.substring(0, 4).equals("call")) return C_CALL;
         else return C_ARITHMETIC;
     }
 

@@ -38,9 +38,9 @@ public class CodeWriter {
      */
     public void writeInit() {
         // Initialize the stack pointer to 0x0100
-        out.println("@256\nD=A\n@SP\nAM=D");
+        out.println("@256\nD=A\n@SP\nM=D");
         // Start executing (the translated code of ) Sys.init
-        out.println("@Sys.init");
+        writeCall("Sys.init", 0);
     }
 
     // Writes assembly code that effects the label command
@@ -55,6 +55,7 @@ public class CodeWriter {
 
     // Writes assembly code that effects the if-goto command
     public void writeIf(String label) {
+        out.println("// write if goto");
         out.println("@SP\nAM=M-1\n" +
                     "D=M\n" +
                     "A=A-1\n" +
@@ -64,7 +65,8 @@ public class CodeWriter {
 
     // Writes assembly code that effects the function command
     public void writeFunction(String functionName, int numVars) {
-        out.println("(" + functionName + ")");
+        out.println("// write function " + functionName);
+        writeLabel(functionName);
         for (int i = 0; i < numVars; i++) {
             writePushPop(Parser.C_PUSH, "constant", 0);
         }
@@ -72,10 +74,31 @@ public class CodeWriter {
 
     // Writes assembly code that effects the call command
     public void writeCall(String functionName, int numVars) {
-
+        out.println("// write call");
+        writePop("return", returnNum);
+        writePop("local", 0);
+        writePop("argument", 0);
+        writePop("this", 0);
+        writePop("that", 0);
+        // ARG = SP - 5 - nArgs
+        out.println("@" + (numVars + 5) +
+                    "\nD=A\n" +
+                    "@SP\n" +
+                    "D=M-D\n" +
+                    "@ARG\n" +
+                    "M=D");
+        // LCL = SP
+        out.println("@SP\n" +
+                    "D=M\n" +
+                    "@LCL\n" +
+                    "M=D");
+        writeGoto(functionName);
+        writeLabel("RETURN" + returnNum++);
     }
 
     // Writes assembly code that effects the return command
+    //      SP LCL ARG THIS THAT
+    // ROM  0  1   2   3    4
     public void writeReturn() {
         out.println("// write return");
         // FRAME = LCL
@@ -86,10 +109,11 @@ public class CodeWriter {
                     "M=D");
 
         // RET = *(FRAME - 5)
+        // all return commands in a function return to the same return address, so don't use returnNum here.
         out.println("@5\n" +
                     "A=D-A\n" +
                     "D=M\n" +
-                    "@RETURN" + returnNum + "\n" +
+                    "@R15\n" +
                     "M=D");
 
         // *ARG = pop()
@@ -136,9 +160,7 @@ public class CodeWriter {
                     "M=D");
 
         // goto RET
-        out.println("@ARG\nA=M\nD=M");
-        out.println("@RETURN" + returnNum++);
-        out.println("A=M\nM=D");
+        out.println("@R15\nA=M\n0;JMP");
     }
 
     /** Writes to the output file the assembly code that implements the given arithmetic command.
@@ -209,6 +231,33 @@ public class CodeWriter {
             default:
                 break;
         }
+    }
+
+    // pop commands for writeCall()
+    private void writePop(String segment, int index) {
+        switch (segment) {
+            case "argument":
+                out.println("@ARG\nD=M");
+                break;
+            case "local":
+                out.println("@LCL\nD=M");
+                break;
+            case "this":
+                out.println("@THIS\nD=M");
+                break;
+            case "that":
+                out.println("@THAT\nD=M");
+                break;
+            case "return":
+                out.println("@RETURN" + index + "\nD=A");
+                break;
+            default:
+                break;
+        }
+        out.println("@SP\n" +
+                    "AM=M+1\n" +
+                    "A=A-1\n" +
+                    "M=D");
     }
 
     /**

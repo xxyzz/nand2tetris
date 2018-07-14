@@ -40,6 +40,9 @@ public class VMTranslator {
                 case Parser.C_RETURN:
                     codeWriter.writeReturn();
                     break;
+                case Parser.C_CALL:
+                    codeWriter.writeCall(parser.arg1(), parser.arg2());
+                    break;
                 default:
                     break;
             }
@@ -59,7 +62,6 @@ public class VMTranslator {
             Parser parser = new Parser(in);
             CodeWriter codeWriter = new CodeWriter(args[0].substring(0, args[0].lastIndexOf('.')) + ".asm");
             codeWriter.setFileName(fileName);
-            codeWriter.writeInit();
             whileLoop(parser, codeWriter);
             codeWriter.close();
         }
