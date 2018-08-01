@@ -1,4 +1,4 @@
-# [NAND to Tetris](http://nand2tetris.org)
+# [NAND to Tetris](https://nand2tetris.org)
 
 Building a Modern Computer From First Principles
 
@@ -17,3 +17,5 @@ Building a Modern Computer From First Principles
 - Project 7: [Virtual Machine I - Stack Arithmetic](https://www.nand2tetris.org/project07)
 
 - Project 8: [Virtual Machine II - Program Control](https://www.nand2tetris.org/project08)
+
+- Project 9: [High-Level Programming](https://www.nand2tetris.org/project09)

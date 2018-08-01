@@ -11,7 +11,7 @@ import edu.princeton.cs.algs4.Out;
 import java.io.File;
 
 public class CodeWriter {
-    private Out out;
+    private final Out out;
     private String fileName;
     private int lCommands;
     private int returnNum;
