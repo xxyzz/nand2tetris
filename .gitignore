@@ -12,7 +12,6 @@ demo/
 06/max/
 06/pong/
 06/rect
-10/
 11/
 12/
 13/
@@ -22,3 +21,8 @@ BitmapEditor/
 Fraction/
 HelloWorld/
 List/
+09/Square/Main.jack
+09/Square/SquareGame.jack
+10/ArrayTest/
+10/ExpressionLessSquare/
+10/Square/
