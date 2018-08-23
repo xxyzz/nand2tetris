@@ -86,7 +86,7 @@ public class JackTokenizer {
     public boolean hasMoreTokens() {
         if (!tokens.isEmpty()) return true;
         else {
-            advance();
+            privateAdvance();
             return !tokens.isEmpty();
         }
     }
@@ -95,6 +95,10 @@ public class JackTokenizer {
     // This method should only be called if hasMoreTokens() is true.
     // Initially there is no current token.
     public void advance() {
+        if (hasMoreTokens()) currentToken = tokens.dequeue();
+    }
+
+    private void privateAdvance() {
         if (in.hasNextLine()) {
             // read one line
             String readCommand = in.readLine().trim();
@@ -129,23 +133,17 @@ public class JackTokenizer {
                 }
             }
             // try next line
-            else advance();
+            else privateAdvance();
         }
     }
 
     // Returns the type of the current token as a constant.
     public int tokenType() {
-        if (tokens.isEmpty()) advance();
-        currentToken = tokens.dequeue();
-        return tokenType(currentToken);
-    }
-    
-    private int tokenType(String token) {
-        if (keywords.contains(token)) return KEYWORD;
-        if (symbols.contains(token)) return SYMBOL;
-        if (token.matches("\\d+")) return INT_CONST;
-        if (token.matches("^\"[^\"\n]*\"$")) return STRING_CONST;
-        if (token.matches("^[A-Za-z_]\\w*")) return IDENTIFIER;
+        if (keywords.contains(currentToken)) return KEYWORD;
+        if (symbols.contains(currentToken)) return SYMBOL;
+        if (currentToken.matches("\\d+")) return INT_CONST;
+        if (currentToken.matches("^\"[^\"\n]*\"$")) return STRING_CONST;
+        if (currentToken.matches("^[A-Za-z_]\\w*")) return IDENTIFIER;
         
         return -1;
     }
@@ -153,7 +151,7 @@ public class JackTokenizer {
     // Returns the keyword which is the current token, as a constant.
     // This method should be called only if tokenType is KEYWORD.
     public int keyWord() {
-        if (tokenType(currentToken) == KEYWORD) {
+        if (tokenType() == KEYWORD) {
             if (currentToken.equals("class")) return CLASS;
             else if (currentToken.equals("method")) return METHOD;
             else if (currentToken.equals("function")) return FUNCTION;
@@ -182,28 +180,28 @@ public class JackTokenizer {
     // Returns the character which is the current token. Should be called only
     // if tokenType() is SYMBOL.
     public char symbol() {
-        if (tokenType(currentToken) == SYMBOL) return currentToken.charAt(0);
+        if (tokenType() == SYMBOL) return currentToken.charAt(0);
         return ' ';
     }
 
     // Returns the identifier which is the current token. Should be called only
     // if tokenType() is IDENTIFIER.
     public String identifier() {
-        if (tokenType(currentToken) == IDENTIFIER) return currentToken;
+        if (tokenType() == IDENTIFIER) return currentToken;
         return "";
     }
 
     // Returns the integer value of the current token. Should be called only
     // if tokenType() is INT_CONST.
     public int intVal() {
-        if (tokenType(currentToken) == INT_CONST) return Integer.parseInt(currentToken);
+        if (tokenType() == INT_CONST) return Integer.parseInt(currentToken);
         return -1;
     }
 
     // Returns the string value of the current token, without the two enclosing double quotes.
     // Should be called only if tokenType() is STRING_CONST.
     public String stringVal() {
-        if (tokenType(currentToken) == STRING_CONST) return currentToken.substring(1, currentToken.length() - 1);
+        if (tokenType() == STRING_CONST) return currentToken.substring(1, currentToken.length() - 1);
         return "";
     }
 
