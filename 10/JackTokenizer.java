@@ -72,7 +72,7 @@ public class JackTokenizer {
     }
     
     private final In in;
-    private Queue<String> tokens;
+    private final Queue<String> tokens;
     private String currentToken;
     
     // Opens the input .jack file and gets ready to tokenize it.
