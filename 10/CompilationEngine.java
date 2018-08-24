@@ -215,7 +215,7 @@ public class CompilationEngine {
             out.println("<symbol> { </symbol>");
             jackTokenizer.advance();
             compileVarDec();
-            jackTokenizer.advance();
+
             if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '}')
                 out.println("<symbol> } </symbol>");
         }
@@ -236,38 +236,162 @@ public class CompilationEngine {
 
             if (jackTokenizer.tokenType() == JackTokenizer.KEYWORD && jackTokenizer.keyWord() == JackTokenizer.VAR)
                 compileVarDec();
-            else compileStatements();
+            else {
+                out.println("<statements>");
+                compileStatements();
+                out.println("</statements>");
+            }
         }
     }
 
     // Compiles a sequence of statements. Does not handle the enclosing ‘‘{}’’.
     public void compileStatements() {
-
+        if (jackTokenizer.tokenType() == JackTokenizer.KEYWORD && jackTokenizer.keyWord() == JackTokenizer.LET) {
+            compileLet();
+        }
+        if (jackTokenizer.tokenType() == JackTokenizer.KEYWORD && jackTokenizer.keyWord() == JackTokenizer.IF) {
+            compileIf();
+        }
+        if (jackTokenizer.tokenType() == JackTokenizer.KEYWORD && jackTokenizer.keyWord() == JackTokenizer.WHILE) {
+            compileWhile();
+        }
+        if (jackTokenizer.tokenType() == JackTokenizer.KEYWORD && jackTokenizer.keyWord() == JackTokenizer.DO) {
+            compileDo();
+        }
+        if (jackTokenizer.tokenType() == JackTokenizer.KEYWORD && jackTokenizer.keyWord() == JackTokenizer.RETURN) {
+            compileReturn();
+        }
     }
 
     // Compiles a let statement.
     public void compileLet() {
+        out.println("<letStatement>\n<keyword> let </keyword>");
+        jackTokenizer.advance();
+        if (jackTokenizer.tokenType() == JackTokenizer.IDENTIFIER) {
+            out.println("<identifier> " + jackTokenizer.identifier() + " </identifier>");
+            jackTokenizer.advance();
+            if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '[') {
+                out.println("<symbol> [ </symbol>");
+                jackTokenizer.advance();
+                compileExpression();
+                if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == ']') {
+                    out.println("<symbol> ] </symbol>");
+                    jackTokenizer.advance();
+                    endCompileLet();
+                }
+            } else endCompileLet();
+        }
+    }
 
+    private void endCompileLet() {
+        if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '=') {
+            out.println("<symbol> = </symbol>");
+            jackTokenizer.advance();
+            compileExpression();
+            if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == ';') {
+                out.println("<symbol> ; </symbol>\n</letStatement>");
+            }
+            jackTokenizer.advance();
+            endSubroutineBody();
+        }
+    }
+
+    private void endSubroutineBody() {
+        if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '}') {
+            out.println("<symbol> } </symbol>");
+        } else compileStatements();
     }
 
     // Compiles an if statement, possibly with a trailing else clause.
     public void compileIf() {
-
+        out.println("<ifStatement>\n<keyword> if </keyword>");
+        if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '(') {
+            out.println("<symbol> ( </symbol>");
+            jackTokenizer.advance();
+            compileExpression();
+            if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == ')') {
+                out.println("<symbol> ) </symbol>");
+                if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '{') {
+                    out.println("<symbol> { </symbol>");
+                    jackTokenizer.advance();
+                    out.println("<statements>");
+                    compileStatements();
+                    out.println("</statements>");
+                    jackTokenizer.advance();
+                    if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '}') {
+                        out.println("<symbol> } </symbol>");
+                        jackTokenizer.advance();
+                        if (jackTokenizer.tokenType() == JackTokenizer.KEYWORD && jackTokenizer.keyWord() == JackTokenizer.ELSE) {
+                            jackTokenizer.advance();
+                            out.println("<statements>");
+                            compileStatements();
+                            out.println("</statements>");
+                            jackTokenizer.advance();
+                            if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '}') {
+                                out.println("<symbol> } </symbol>\n</ifStatement>");
+                                jackTokenizer.advance();
+                                endSubroutineBody();
+                            }
+                        } else {
+                            out.println("</ifStatement>");
+                            endSubroutineBody();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // Compiles a while statement.
     public void compileWhile() {
-
+        out.println("<whileStatement>\n<keyword> while </keyword>");
+        if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '(') {
+            out.println("<symbol> ( </symbol>");
+            jackTokenizer.advance();
+            compileExpression();
+            jackTokenizer.advance();
+            if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == ')') {
+                out.println("<symbol> ) </symbol>");
+                jackTokenizer.advance();
+                if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '{') {
+                    out.println("<symbol> { </symbol>");
+                    jackTokenizer.advance();
+                    out.println("<statements>");
+                    compileStatements();
+                    out.println("</statements>");
+                    jackTokenizer.advance();
+                    if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == '}') {
+                        out.println("<symbol> } </symbol>\n</whileStatement>");
+                        jackTokenizer.advance();
+                        endSubroutineBody();
+                    }
+                }
+            }
+        }
     }
 
     // Compiles a do statement.
     public void compileDo() {
-
+        out.println("<doStatement>\n<keyword> do </keyword>");
+        jackTokenizer.advance();
+        // subroutineCall
+        if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == ';') {
+            out.println("<symbol> ; </symbol>\n</doStatement>");
+            jackTokenizer.advance();
+            endSubroutineBody();
+        }
     }
 
     // Compiles a return statement.
     public void compileReturn() {
-
+        out.println("<returnStatement>\n<keyword> return </keyword>");
+        jackTokenizer.advance();
+        compileExpression(); // 0 or 1
+        if (jackTokenizer.tokenType() == JackTokenizer.SYMBOL && jackTokenizer.symbol() == ';') {
+            out.println("<symbol> ; </symbol>\n</returnStatement>");
+            jackTokenizer.advance();
+            endSubroutineBody();
+        }
     }
 
     // Compiles an expression.
