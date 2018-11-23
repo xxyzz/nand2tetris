@@ -20,7 +20,7 @@ public class VMWriter {
     private String convertString(int segment) {
         switch (segment) {
             case CompilationEngine.CONST:
-                return "const";
+                return "constant";
             case CompilationEngine.ARGUMENT:
                 return "argument";
             case CompilationEngine.LOCAL:
